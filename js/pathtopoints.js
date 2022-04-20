@@ -204,12 +204,13 @@ function getInfosFromPaths(paths) {
 
     paths_info.width = (paths_info.bbox_right.x + paths_info.bbox_right.width) - paths_info.bbox_left.x;
     paths_info.height = (paths_info.bbox_bottom.y + paths_info.bbox_bottom.height) - paths_info.bbox_top.y;
+    console.log(paths_info.width, paths_info.height);
     paths_info.x = paths_info.bbox_left.x;
     paths_info.y = paths_info.bbox_top.y;
     if (paths_info.height > paths_info.width)
-        paths_info.scale = (paths_info.height > paper.canvas.clientHeight) ? (paper.canvas.clientHeight / paths_info.height) : 1;
+        paths_info.scale = 1;//(paths_info.height > paper.canvas.clientHeight) ? (paper.canvas.clientHeight / paths_info.height) : 1;
     else
-        paths_info.scale = (paths_info.width > paper.canvas.clientWidth) ? (paper.canvas.clientWidth / paths_info.width) : 1;
+        paths_info.scale = 1;//(paths_info.width > 256) ? (256 / paths_info.width) : 1;
 
     // console.log(paths_info);
     // Display bboxes used for centering paths
@@ -231,33 +232,38 @@ function generatePointsFromSvg() {
     var parser = new DOMParser();
     var doc = parser.parseFromString(current_svg_xml, "application/xml");
     var paths = doc.getElementsByTagName("path");
+    var viewport = doc.getElementsByTagName("svg")[0].viewBox.baseVal;
+    console.log(viewport);
     current_displayed_paths = paths;
 
     // Read each paths from svg
     var paths_info = getInfosFromPaths(paths);
-    var offset_path_x = (paths_info.x * paths_info.scale * -1) + (paper.canvas.clientWidth / 2) - (paths_info.width * paths_info.scale / 2);
-    var offset_path_y = (paths_info.y * paths_info.scale * -1) + (paper.canvas.clientHeight / 2) - (paths_info.height * paths_info.scale / 2);
+    var offset_path_x = paper.canvas.clientWidth / 2 - viewport.width / 2;//(paths_info.x * paths_info.scale * -1) + (paper.canvas.clientWidth / 2) - (paths_info.width * paths_info.scale / 2);
+    var offset_path_y = -paper.canvas.clientHeight + viewport.height;//(paths_info.y * paths_info.scale * -1) + (paper.canvas.clientHeight / 2) - (paths_info.height * paths_info.scale / 2);
     var imageData = {};
     imageData.paths = [];
     var all_points = "";
     var all_points_count = 0;
     for (var i = 0; i < paths.length; ++i) {
         var path = $($(paths).get(i)).attr('d').replace(' ', ',');
+
+
         var imagePath = {};
         imagePath.points = [];
 
         // get points at regular intervals
         var data_points = "";
-        var color = randomColor();
+        var color = "#2a84de";//randomColor();
         var c;
         for (c = 0; c < Raphael.getTotalLength(path); c += step_point) {
-            var point = Raphael.getPointAtLength(path, c);
+            var point = Raphael.getPointAtLength(path, c); 
+
             var imagePoint = {};
-            imagePoint.x = point.x;
-            imagePoint.y = point.y;
+            imagePoint.x = point.x - viewport.x;
+            imagePoint.y = point.y - viewport.y;
             imagePath.points.push(imagePoint);
 
-            data_points += point.x + "," + point.y + "&#13;";
+            data_points += imagePoint.x + "," + imagePoint.y + "&#13;";
             var circle = paper.circle(point.x * paths_info.scale, point.y * paths_info.scale, 2)
                 .attr("fill", color)
                 .attr("stroke", "none")

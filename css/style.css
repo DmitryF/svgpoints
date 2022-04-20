@@ -234,7 +234,7 @@ html, body {
 
 .bellows {
   z-index: 999;
-  margin-top: 70px;
+  margin-top: 0px;
   float: left;
   margin-left: 10%;
   min-width: 20%;
