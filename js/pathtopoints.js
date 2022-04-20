@@ -204,7 +204,7 @@ function getInfosFromPaths(paths) {
 
     paths_info.width = (paths_info.bbox_right.x + paths_info.bbox_right.width) - paths_info.bbox_left.x;
     paths_info.height = (paths_info.bbox_bottom.y + paths_info.bbox_bottom.height) - paths_info.bbox_top.y;
-    console.log(paths_info.width, paths_info.height);
+    //console.log(paths_info.width, paths_info.height);
     paths_info.x = paths_info.bbox_left.x;
     paths_info.y = paths_info.bbox_top.y;
     if (paths_info.height > paths_info.width)
@@ -233,7 +233,7 @@ function generatePointsFromSvg() {
     var doc = parser.parseFromString(current_svg_xml, "application/xml");
     var paths = doc.getElementsByTagName("path");
     var viewport = doc.getElementsByTagName("svg")[0].viewBox.baseVal;
-    console.log(viewport);
+    // console.log(viewport);
     current_displayed_paths = paths;
 
     // Read each paths from svg
@@ -276,7 +276,7 @@ function generatePointsFromSvg() {
         addBelow("Path " + i, color, data_points, c / step_point);
     }
     lastImageData = imageData;
-    console.log(JSON.stringify(imageData));
+    // console.log(JSON.stringify(imageData));
 
     addBelow("All Paths", "#2A2A2A", all_points, all_points_count / step_point);
     
